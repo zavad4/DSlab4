@@ -398,8 +398,8 @@ for(let i = 0; i < A.length; i++) {
 
 let treeinfo = {};
 for(let i = 1; i < list.length - 1; i+=2) {
-  let curr = list[i];
-  let next = list[i+1];
+  const curr = grafinfo[`vert${list[i]}`].number;
+  const next = grafinfo[`vert${list[i + 1]}`].number;
   if(treeinfo[next] !== curr) {
     treeinfo[curr] = next;
     treeMatrix[curr-1][next-1] = 1;
