@@ -24,7 +24,7 @@ const ctx = canvas.getContext('2d');
 
 const C = JSON.parse(JSON.stringify(A));
 
-const r = 15;
+const r = 20;
 const rloops = 3 * r / 4;
 const arrr = 5;
 
@@ -83,7 +83,7 @@ const buildVertex = (n, P, x0, y0, obj) => {
     newX -= step;
   }
 };
-buildVertex(11, 1600, 75, 100, grafinfo);
+buildVertex(11, 2000, 40, 40, grafinfo);
 
 const makeCons = (matrix, obj) => {
   for (const key in obj) {
@@ -178,8 +178,8 @@ const readyCons = (x0, y0, x1, y1, r) => {
   function simpleAdditionalDots(x0, y0, x1, y1) {
     const alpha = Math.atan2(y1 - y0, x1 - x0);
     return { 
-      dx : (r * 3.5) * Math.cos(Math.PI / 2 - alpha),
-      dy : (r * 3.2) * Math.sin(Math.PI / 2 - alpha)
+      dx : (r * 2.5) * Math.cos(Math.PI / 2 - alpha),
+      dy : (r * 2.6) * Math.sin(Math.PI / 2 - alpha)
       }
   }
 
@@ -187,7 +187,7 @@ const readyCons = (x0, y0, x1, y1, r) => {
     const alpha = Math.atan2(y1 - y0, x1 - x0);
     return { 
       dx : (r * 1.15) * Math.cos(Math.PI / 2 - alpha),
-      dy : (r * 0.65) * Math.sin(Math.PI / 2 - alpha)
+      dy : (r * 0.55) * Math.sin(Math.PI / 2 - alpha)
       }
   }
 
@@ -267,10 +267,29 @@ const drawVertex = obj => {
     ctx.fillStyle = "grey";
     ctx.fill();
     ctx.strokeStyle = "yellow";
+    ctx.font = '20px Times New Roman';
     ctx.strokeText(obj[key].num, obj[key].coords[0], obj[key].coords[1]);
     ctx.stroke();
   }
 }
+
+const drawNewVertex = obj => {
+  for (let key in obj) {
+    ctx.beginPath();
+    ctx.arc(obj[key].coords[0], obj[key].coords[1], r, 0, 2 * Math.PI, false);
+    ctx.fillStyle = "grey";
+    ctx.fill();
+    ctx.strokeStyle = "yellow";
+    ctx.font = '14px Times new Roman';
+    ctx.strokeText(obj[key].num +'-' + obj[key].number, obj[key].coords[0], obj[key].coords[1]);
+    ctx.stroke();
+  }
+}
+
+makeCons(A, grafinfo);
+drawLoops(loops, grafinfo,75, 100);
+drawOrSimpleCons(grafinfo);
+drawOrDoubleCons(grafinfo);
 
 const list = [];
 const BFS = (obj, n) => {
@@ -293,21 +312,33 @@ const BFS = (obj, n) => {
     }
   }
 };
+BFS(grafinfo, 1); 
 
-for (let i = 0; i < list.length; i++) {
-  grafinfo[`vert${list[i]}`].number = i + 1;
+let c = 1;
+for (let i = 0; i < list.length; i+=2) {
+  grafinfo[`vert${list[i]}`].number = c;
+  c++;
 };
-
-console.log(grafinfo);
-
-for (let i = 0; i < list.length; i++) {
-  console.log(list[i]);
-}
-
-console.log(list);
 const iter = list[Symbol.iterator]();
 let prev = 0;
 const visited = [];
+
+let numMatrix = [];
+for(let i = 0; i < A.length; i++) {
+  numMatrix[i] = [];
+  for(let j = 0; j < A.length; j++) {
+    numMatrix[i][j] = 0;
+  }
+}
+for(let i = 0; i < A.length; i++) {
+numMatrix[grafinfo[`vert${i+1}`].number - 1][grafinfo[`vert${i+1}`].num - 1] = 1;
+}
+ctx.font = '22px Times new Roman';
+ctx.fillText('Renumbering matrix', 320, 660);
+for (let i = 0; i < numMatrix.length; i++) {
+  ctx.font = '22px Times new Roman';
+  ctx.fillText(`${numMatrix[i]}`, 320, 660 + (i + 1) * 25);
+}
 
 const halt = () => {
   let currVal = iter.next().value;
@@ -320,8 +351,8 @@ const halt = () => {
       ctx.strokeStyle = 'black';
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
-      ctx.strokeText(`${x}`, grafinfo[`vert${x}`].coords[0], grafinfo[`vert${x}`].coords[1]);
-      ctx.fillText(`${x}`, grafinfo[`vert${x}`].coords[0], grafinfo[`vert${x}`].coords[1]);
+      ctx.strokeText(grafinfo[`vert${x}`].number, grafinfo[`vert${x}`].coords[0], grafinfo[`vert${x}`].coords[1]);
+      ctx.fillText(grafinfo[`vert${x}`].number, grafinfo[`vert${x}`].coords[0], grafinfo[`vert${x}`].coords[1]);
     }
   });
   const currVert = `vert${currVal}`;
@@ -329,27 +360,27 @@ const halt = () => {
   ctx.beginPath();
   drawCircle(ctx, grafinfo[currVert].coords[0], grafinfo[currVert].coords[1], r, 'green', 'black');
   { //text
-    ctx.font = '20px Times New Roman';
+    ctx.font = '24px Times New Roman';
     ctx.fillStyle = 'white';
     ctx.strokeStyle = 'black';
     ctx.textBaseline = 'middle';
     ctx.textAlign =
      'center';
-    ctx.strokeText(`${currVal}`, grafinfo[currVert].coords[0], grafinfo[currVert].coords[1]);
-    ctx.fillText(`${currVal}`, grafinfo[currVert].coords[0], grafinfo[currVert].coords[1]);
+    ctx.strokeText(grafinfo[`vert${currVal}`].number, grafinfo[currVert].coords[0], grafinfo[currVert].coords[1]);
+    ctx.fillText(grafinfo[`vert${currVal}`].number, grafinfo[currVert].coords[0], grafinfo[currVert].coords[1]);
   }
   if (prev) {
     ctx.beginPath();
     drawCircle(ctx, grafinfo[prevVert].coords[0], grafinfo[prevVert].coords[1], r, 'red', 'black');
 
-    { //text
+    {
       ctx.font = '20px Times New Roman';
       ctx.fillStyle = 'white';
       ctx.strokeStyle = 'black';
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
-      ctx.strokeText(`${prev}`, grafinfo[prevVert].coords[0], grafinfo[prevVert].coords[1]);
-      ctx.fillText(`${prev}`, grafinfo[prevVert].coords[0], grafinfo[prevVert].coords[1]);
+      ctx.strokeText(grafinfo[`vert${prev}`].number, grafinfo[prevVert].coords[0], grafinfo[prevVert].coords[1]);
+      ctx.fillText(grafinfo[`vert${prev}`].number, grafinfo[prevVert].coords[0], grafinfo[prevVert].coords[1]);
     }
   }
   visited.push(currVal);
@@ -357,9 +388,73 @@ const halt = () => {
   prev = currVal;
 };
 
-makeCons(A, grafinfo);
-drawLoops(loops, grafinfo,75, 100);
-drawOrSimpleCons(grafinfo);
-drawOrDoubleCons(grafinfo);
-drawVertex(grafinfo);
-BFS(grafinfo, 1);
+let treeMatrix = [];
+for(let i = 0; i < A.length; i++) {
+  treeMatrix[i] = [];
+  for(let j = 0; j < A.length; j++) {
+    treeMatrix[i][j] = 0;
+  }
+}
+
+let treeinfo = {};
+for(let i = 1; i < list.length - 1; i+=2) {
+  let curr = list[i];
+  let next = list[i+1];
+  if(treeinfo[next] !== curr) {
+    treeinfo[curr] = next;
+    treeMatrix[curr-1][next-1] = 1;
+  } 
+}
+
+{
+  const n = A.length;
+  const x = 950;
+  const y = 300;
+  const r = 230;
+  
+  const alpha = 2 * Math.PI / n;
+
+  let vertics = {};
+  let i = 1;
+  let c1 = 1;
+  for (let angle = 0; i <= n; angle += alpha) {
+    const newX = x + r * Math.cos(angle);
+    const newY = y + r * Math.sin(angle);
+    vertics[`vert${i}`] = {};
+    vertics[`vert${i}`].coords = [];
+    vertics[`vert${i}`].coords.push(newX);
+    vertics[`vert${i}`].coords.push(newY);
+    vertics[`vert${i}`].num = grafinfo[`vert${i}`].number;
+    i++;
+  }
+  treeinfo = vertics;
+}
+
+const drawNewOrSimpleCons = obj => {
+  for (const key in obj) {
+    for (let i = 0; i < obj[key].simplecon.length; i++) {
+      const fromX = obj[key].coords[0];
+      const fromY = obj[key].coords[1];
+      const toX = obj[`${obj[key].simplecon[i]}`].coords[0];
+      const toY = obj[`${obj[key].simplecon[i]}`].coords[1];
+        ctx.beginPath();
+        ctx.moveTo(fromX, fromY);
+        ctx.strokeStyle = "black";
+        ctx.lineTo(toX, toY);
+        ctx.stroke();
+        const coordinates = readyCons(fromX, fromY, toX, toY, r);
+        drawArrowhead(fromX, fromY, coordinates.x, coordinates.y, arrr);  
+      }
+    }
+  }
+  ctx.fillText('Adjacency matrix of tree', 900, 660);
+  for (let i = 0; i < treeMatrix.length; i++) {
+    ctx.font = '22px Times new Roman';
+    ctx.fillText(`${treeMatrix[i]}`, 900, 660 + (i + 1) * 25);
+  }
+
+makeCons(treeMatrix, treeinfo);
+drawNewOrSimpleCons(treeinfo);
+drawNewVertex(grafinfo);
+drawVertex(treeinfo);
+
