@@ -388,23 +388,42 @@ const halt = () => {
   prev = currVal;
 };
 
-let treeMatrix = [];
-for(let i = 0; i < A.length; i++) {
+const treeMatrix = [];
+for (let i = 0; i < A.length; i++) {
   treeMatrix[i] = [];
-  for(let j = 0; j < A.length; j++) {
+  for (let j = 0; j < A.length; j++) {
     treeMatrix[i][j] = 0;
   }
 }
 
 let treeinfo = {};
-for(let i = 1; i < list.length - 1; i+=2) {
+for (let i = 1; i < list.length - 1; i += 2) {
+  const curr = grafinfo[`vert${list[i]}`].num;
+  const next = grafinfo[`vert${list[i + 1]}`].num;
+  if (treeinfo[next] !== curr) {
+    treeinfo[curr] = next;
+    treeMatrix[curr - 1][next - 1] = 1;
+  }
+}
+
+const treeMatrixPrint = [];
+for (let i = 0; i < A.length; i++) {
+  treeMatrixPrint[i] = [];
+  for (let j = 0; j < A.length; j++) {
+    treeMatrixPrint[i][j] = 0;
+  }
+}
+
+let treeinfoPrint = {};
+for (let i = 1; i < list.length - 1; i += 2) {
   const curr = grafinfo[`vert${list[i]}`].number;
   const next = grafinfo[`vert${list[i + 1]}`].number;
-  if(treeinfo[next] !== curr) {
-    treeinfo[curr] = next;
-    treeMatrix[curr-1][next-1] = 1;
-  } 
+  if (treeinfoPrint[next] !== curr) {
+    treeinfoPrint[curr] = next;
+    treeMatrixPrint[curr - 1][next - 1] = 1;
+  }
 }
+
 
 {
   const n = A.length;
@@ -448,9 +467,9 @@ const drawNewOrSimpleCons = obj => {
     }
   }
   ctx.fillText('Adjacency matrix of tree', 900, 660);
-  for (let i = 0; i < treeMatrix.length; i++) {
+  for (let i = 0; i < treeMatrixPrint.length; i++) {
     ctx.font = '22px Times new Roman';
-    ctx.fillText(`${treeMatrix[i]}`, 900, 660 + (i + 1) * 25);
+    ctx.fillText(`${treeMatrixPrint[i]}`, 900, 660 + (i + 1) * 25);
   }
 
 makeCons(treeMatrix, treeinfo);
